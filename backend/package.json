@@ -40,7 +40,7 @@
   },
   "description": "",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js", 
     "build": "tsc",
     "dev": "ts-node src/server.ts"
   }
