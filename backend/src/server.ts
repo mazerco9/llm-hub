@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
 import winston from 'winston';
 import dotenv from 'dotenv';
 import config from './config/environment';
+import authRoutes from './routes/auth.routes';
+import passport from './config/passport';
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -100,5 +102,11 @@ process.on('SIGTERM', async () => {
     process.exit(1);
   }
 });
+
+// Initialisation de Passport
+app.use(passport.initialize());
+
+// Routes d'authentification
+app.use('/api/auth', authRoutes);
 
 export default app;

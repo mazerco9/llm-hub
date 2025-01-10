@@ -3,3 +3,63 @@
 {"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T14:24:58.180Z"}
 {"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T14:24:58.182Z"}
 {"level":"info","message":"Mode: development","timestamp":"2025-01-10T14:24:58.182Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : authentication failed","ok":0},"level":"error","message":"Erreur de connexion à MongoDB: bad auth : authentication failed","ok":0,"stack":"MongoServerError: bad auth : authentication failed\n    at Connection.sendCommand (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:545:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:617:22)\n    at async continueScramConversation (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:187:13)\n    at async executeScram (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:114:3)\n    at async ScramSHA1.auth (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:60:12)\n    at async performInitialHandshake (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:164:7)\n    at async connect (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:43:5)","timestamp":"2025-01-10T17:00:01.395Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : authentication failed","ok":0},"level":"error","message":"Erreur de connexion à MongoDB: bad auth : authentication failed","ok":0,"stack":"MongoServerError: bad auth : authentication failed\n    at Connection.sendCommand (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:545:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:617:22)\n    at async continueScramConversation (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:187:13)\n    at async executeScram (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:114:3)\n    at async ScramSHA1.auth (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:60:12)\n    at async performInitialHandshake (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:164:7)\n    at async connect (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:43:5)","timestamp":"2025-01-10T17:01:58.142Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : authentication failed","ok":0},"level":"error","message":"Erreur de connexion à MongoDB: bad auth : authentication failed","ok":0,"stack":"MongoServerError: bad auth : authentication failed\n    at Connection.sendCommand (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:545:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:617:22)\n    at async continueScramConversation (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:187:13)\n    at async executeScram (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:114:3)\n    at async ScramSHA1.auth (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:60:12)\n    at async performInitialHandshake (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:164:7)\n    at async connect (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:43:5)","timestamp":"2025-01-10T17:02:05.073Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : authentication failed","ok":0},"level":"error","message":"Erreur de connexion à MongoDB: bad auth : authentication failed","ok":0,"stack":"MongoServerError: bad auth : authentication failed\n    at Connection.sendCommand (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:545:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:617:22)\n    at async continueScramConversation (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:187:13)\n    at async executeScram (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:114:3)\n    at async ScramSHA1.auth (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:60:12)\n    at async performInitialHandshake (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:164:7)\n    at async connect (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:43:5)","timestamp":"2025-01-10T17:02:10.068Z"}
+{"code":8000,"codeName":"AtlasError","connectionGeneration":0,"errorResponse":{"code":8000,"codeName":"AtlasError","errmsg":"bad auth : authentication failed","ok":0},"level":"error","message":"Erreur de connexion à MongoDB: bad auth : authentication failed","ok":0,"stack":"MongoServerError: bad auth : authentication failed\n    at Connection.sendCommand (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:545:17)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async Connection.command (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connection.ts:617:22)\n    at async continueScramConversation (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:187:13)\n    at async executeScram (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:114:3)\n    at async ScramSHA1.auth (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/auth/scram.ts:60:12)\n    at async performInitialHandshake (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:164:7)\n    at async connect (/Users/marc-antoinediot/Documents/llm-hub/backend/node_modules/mongodb/src/cmap/connect.ts:43:5)","timestamp":"2025-01-10T17:02:31.094Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:02:32.921Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:02:32.924Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:02:32.924Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:19:53.655Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:19:53.659Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:19:53.660Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:20:13.435Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:20:13.438Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:20:13.439Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:21:50.065Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:21:50.069Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:21:50.069Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:22:22.850Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:22:22.854Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:22:22.854Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:23:32.284Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:23:32.287Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:23:32.288Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:23:34.459Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:23:34.461Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:23:34.462Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:23:36.084Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:23:36.087Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:23:36.087Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:23:38.721Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:23:38.725Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:23:38.725Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:24:24.617Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:24:24.620Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:24:24.620Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:25:29.276Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:25:29.283Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:25:29.283Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:25:32.449Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:25:32.452Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:25:32.452Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:25:38.753Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:25:38.757Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:25:38.757Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:26:04.616Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:26:04.619Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:26:04.620Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:26:08.252Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:26:08.255Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:26:08.255Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:26:45.143Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:26:45.146Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:26:45.146Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:27:33.018Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:27:33.024Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:27:33.024Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T17:27:58.333Z"}
+{"level":"info","message":"Serveur démarré sur le port 4000","timestamp":"2025-01-10T17:27:58.336Z"}
+{"level":"info","message":"Mode: development","timestamp":"2025-01-10T17:27:58.336Z"}
+{"level":"info","message":"Connecté à MongoDB","timestamp":"2025-01-10T20:31:44.159Z"}
