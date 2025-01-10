@@ -38,5 +38,11 @@
     "@types/passport-local": "^1.0.38",
     "nodemon": "^3.1.9"
   },
-  "description": ""
+  "description": "",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev": "ts-node src/server.ts"
+  }
 }
+
