@@ -4,7 +4,11 @@ import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 import mongoose from 'mongoose';
 import winston from 'winston';
-import config from '../config/default';
+import dotenv from 'dotenv';
+import config from './config/environment';
+
+// Chargement des variables d'environnement
+dotenv.config();
 
 // Configuration du logger
 const logger = winston.createLogger({
