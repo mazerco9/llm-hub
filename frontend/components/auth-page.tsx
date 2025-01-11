@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
+const setCookie = (name: string, value: string, days: number) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+}
+
 export default function AuthPage() {
   const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
@@ -39,9 +45,9 @@ export default function AuthPage() {
         throw new Error(data.message || "Une erreur est survenue")
       }
 
-      // Stockage du token et redirection
-      localStorage.setItem("token", data.token)
-      router.push("/chat")
+      // Stockage du token dans un cookie et redirection
+      setCookie('token', data.token, 7) // Cookie valide 7 jours
+      router.push("/auth-group/chat")
     } catch (err: any) {
       setError(err.message)
     } finally {
