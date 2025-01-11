@@ -9,6 +9,7 @@ import config from './config/environment';
 import authRoutes from './routes/auth.routes';
 import passport from './config/passport';
 import conversationRoutes from './routes/conversation.routes';
+import { chatRoutes } from './routes/chat.routes';
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -111,5 +112,7 @@ app.use(passport.initialize());
 app.use('/api/auth', authRoutes);
 
 app.use('/api/conversations', conversationRoutes);
+
+app.use('/api/chat', chatRoutes);
 
 export default app;
