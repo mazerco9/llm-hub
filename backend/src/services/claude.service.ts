@@ -1,4 +1,4 @@
-import axios from 'axios';
+import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config/environment';
 
 interface Message {
@@ -16,41 +16,36 @@ interface ClaudeResponse {
 }
 
 class ClaudeService {
-  private apiKey: string;
-  private baseURL: string;
+  private client: Anthropic;
 
   constructor() {
-    this.apiKey = config.llm.CLAUDE_API_KEY;
-    this.baseURL = 'https://api.anthropic.com/v1';
+    this.client = new Anthropic({
+      apiKey: config.llm.CLAUDE_API_KEY
+    });
   }
 
   async sendMessage(messages: Message[]): Promise<ClaudeResponse> {
     try {
-      const response = await axios.post(
-        `${this.baseURL}/messages`,
-        {
-          model: "claude-3-opus-20240229",
-          messages: messages,
-          max_tokens: 1024,
-          temperature: 0.7
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': this.apiKey,
-            'anthropic-version': '2023-06-01'
-          }
-        }
-      );
+      const response = await this.client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 1024,
+        messages: messages,
+      });
 
-      return {
-        text: response.data.content[0].text,
-        usage: {
-          prompt_tokens: response.data.usage.input_tokens,
-          completion_tokens: response.data.usage.output_tokens,
-          total_tokens: response.data.usage.input_tokens + response.data.usage.output_tokens
-        }
-      };
+      // Vérification et extraction du texte de la réponse
+      const content = response.content[0];
+      if ('text' in content) {
+        return {
+          text: content.text,
+          usage: {
+            prompt_tokens: response.usage.input_tokens,
+            completion_tokens: response.usage.output_tokens,
+            total_tokens: response.usage.input_tokens + response.usage.output_tokens
+          }
+        };
+      } else {
+        throw new Error('Unexpected response format from Claude');
+      }
     } catch (error) {
       console.error('Error calling Claude API:', error);
       throw new Error('Failed to get response from Claude');
