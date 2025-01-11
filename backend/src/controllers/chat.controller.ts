@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import { claudeService } from '../services/claude.service';
-import ConversationModel from '../models/conversation.model';
 import mongoose from 'mongoose';
 
-// Extension du type Request pour inclure l'utilisateur
+// Interface pour les erreurs typées
+interface ApiError extends Error {
+  message: string;
+}
+
 interface AuthRequest extends Request {
   user?: {
     _id: mongoose.Types.ObjectId;
@@ -13,62 +16,50 @@ interface AuthRequest extends Request {
 export const chatController = {
   async sendMessage(req: AuthRequest, res: Response) {
     try {
+      console.log('Début de sendMessage');
       const { message } = req.body;
-      if (!req.user?._id) {
-        return res.status(401).json({ error: 'User not authenticated' });
+      console.log('Message reçu:', message);
+
+      // Appel à Claude
+      console.log('Appel du service Claude');
+      const messages = [{ role: 'user' as const, content: message }];
+      
+      try {
+        const claudeResponse = await claudeService.sendMessage(messages);
+        console.log('Réponse de Claude reçue:', claudeResponse);
+        return res.json(claudeResponse);
+      } catch (error) {
+        const claudeError = error as ApiError;
+        console.error('Erreur Claude API:', claudeError);
+        return res.status(500).json({ 
+          error: 'Failed to get response from Claude',
+          details: claudeError.message || 'Unknown error'
+        });
       }
-
-      // Appeler l'API Claude
-      const messages = [
-        {
-          role: 'user' as const,
-          content: message
-        }
-      ];
-
-      const response = await claudeService.sendMessage(messages);
-
-      // Créer ou mettre à jour la conversation
-      await ConversationModel.create({
-        title: `Conversation ${new Date().toLocaleString()}`, // Titre par défaut
-        userId: req.user._id,
-        messages: [
-          { 
-            role: 'user', 
-            content: message,
-            model: 'user',
-            timestamp: new Date()
-          },
-          { 
-            role: 'assistant', 
-            content: response.text,
-            model: 'claude',
-            timestamp: new Date()
-          }
-        ]
-      });
-
-      return res.json(response);
     } catch (error) {
-      console.error('Error in chat controller:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      const generalError = error as ApiError;
+      console.error('Erreur générale dans sendMessage:', generalError);
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        details: generalError.message || 'Unknown error'
+      });
     }
   },
 
+  // Ajout de la méthode getHistory
   async getHistory(req: AuthRequest, res: Response) {
     try {
-      if (!req.user?._id) {
-        return res.status(401).json({ error: 'User not authenticated' });
-      }
-
-      const conversations = await ConversationModel.find({ userId: req.user._id })
-        .sort({ createdAt: -1 })
-        .limit(10);
-
-      return res.json(conversations);
+      console.log('Récupération de l\'historique');
+      // Pour l'instant, retournons un tableau vide
+      // Nous implémenterons la vraie fonctionnalité plus tard
+      return res.json([]);
     } catch (error) {
-      console.error('Error fetching chat history:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      const historyError = error as ApiError;
+      console.error('Erreur lors de la récupération de l\'historique:', historyError);
+      return res.status(500).json({ 
+        error: 'Failed to get chat history',
+        details: historyError.message || 'Unknown error'
+      });
     }
   }
 };
