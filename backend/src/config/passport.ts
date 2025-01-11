@@ -1,7 +1,10 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import { User } from '../models/user.model';
+import { User, IUser } from '../models/user.model';
+
+// Type pour la fonction done
+type DoneCallback = (error: any, user?: any, options?: { message: string }) => void;
 
 // Configuration de la stratégie locale (email + mot de passe)
 passport.use(
@@ -10,7 +13,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    async (email, password, done) => {
+    async (email: string, password: string, done: DoneCallback) => {
       try {
         // Recherche de l'utilisateur
         const user = await User.findOne({ email: email.toLowerCase() });
@@ -44,7 +47,7 @@ passport.use(
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: JWT_SECRET,
     },
-    async (jwtPayload, done) => {
+    async (jwtPayload: { id: string }, done: DoneCallback) => {
       try {
         // Vérification de l'existence de l'utilisateur
         const user = await User.findById(jwtPayload.id);
@@ -60,11 +63,11 @@ passport.use(
 );
 
 // Sérialisation pour les sessions (optionnel si on utilise uniquement JWT)
-passport.serializeUser((user: any, done) => {
-  done(null, user.id);
+passport.serializeUser((user: any, done: DoneCallback) => {
+  done(null, user._id);
 });
 
-passport.deserializeUser(async (id: string, done) => {
+passport.deserializeUser(async (id: string, done: DoneCallback) => {
   try {
     const user = await User.findById(id);
     done(null, user);

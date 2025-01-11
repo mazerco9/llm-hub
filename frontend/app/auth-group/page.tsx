@@ -1,17 +1,5 @@
-import { Metadata } from "next"
-import AuthPage from "@/components/auth-page"
+import { redirect } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
-
-export const metadata: Metadata = {
-  title: "LLM Hub Personnel",
-  description: "Interface unifiée de chatbots",
-}
-
-export default function HomePage() {
-  return (
-    <div className="container relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-1 lg:px-0">
-      <AuthPage />
-    </div>
-  )
+export default function AuthGroupPage() {
+  redirect('/auth-group/chat')
 }
