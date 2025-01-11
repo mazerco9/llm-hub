@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import config from './config/environment';
 import authRoutes from './routes/auth.routes';
 import passport from './config/passport';
+import conversationRoutes from './routes/conversation.routes';
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -108,5 +109,7 @@ app.use(passport.initialize());
 
 // Routes d'authentification
 app.use('/api/auth', authRoutes);
+
+app.use('/api/conversations', conversationRoutes);
 
 export default app;
