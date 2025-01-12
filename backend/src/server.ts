@@ -45,20 +45,48 @@ const io = new SocketServer(httpServer, {
   }
 });
 
-// Middleware
+// Middleware de logging pour toutes les requêtes
+app.use((req, res, next) => {
+  logger.info('=== Requête entrante ===', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body,
+    query: req.query
+  });
+  next();
+});
+
+// Middleware CORS et JSON
 app.use(cors({
-  origin: config.cors.origin
+  origin: config.cors.origin,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
-// Routes de base pour la santé de l'application
+// Initialisation de Passport
+app.use(passport.initialize());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/conversations', conversationRoutes);
+app.use('/api/chat', chatRoutes);
+
+// Route de santé
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: config.server.nodeEnv });
 });
 
 // Gestion des erreurs globale
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error(err.stack);
+  logger.error('Erreur serveur:', {
+    error: err.message,
+    stack: err.stack,
+    url: req.url,
+    method: req.method
+  });
   res.status(500).json({ 
     error: 'Une erreur interne est survenue',
     message: config.server.nodeEnv === 'development' ? err.message : undefined
@@ -104,15 +132,5 @@ process.on('SIGTERM', async () => {
     process.exit(1);
   }
 });
-
-// Initialisation de Passport
-app.use(passport.initialize());
-
-// Routes d'authentification
-app.use('/api/auth', authRoutes);
-
-app.use('/api/conversations', conversationRoutes);
-
-app.use('/api/chat', chatRoutes);
 
 export default app;
