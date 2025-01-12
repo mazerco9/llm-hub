@@ -26,9 +26,11 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`, // Format Bearer
+        'Accept': 'application/json',
       },
       body: JSON.stringify({ message }),
+      credentials: 'include', // Important pour les cookies
     });
 
     if (!response.ok) {
