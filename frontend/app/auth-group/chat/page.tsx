@@ -16,6 +16,7 @@ interface Message {
 }
 
 export default function ChatPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://llm-hub-backend.onrender.com';
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,7 @@ export default function ChatPage() {
 
   const loadConversationMessages = async (conversationId: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${conversationId}`, {
+      const response = await fetch(`${API_URL}/api/conversations/${conversationId}`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -65,7 +66,7 @@ export default function ChatPage() {
     }
 
     console.log('Initialisation de Socket.IO...');
-    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
+    const socketInstance = io(API_URL, {
       auth: { token },
       transports: ['websocket', 'polling']
     });
@@ -112,7 +113,7 @@ export default function ChatPage() {
 
       if (activeConversationId && messages.length > 0) {
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${activeConversationId}/messages`, {
+          await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -120,7 +121,10 @@ export default function ChatPage() {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
-              messages: messages
+              messages: messages.map(msg => ({
+                role: msg.role,
+                content: msg.content
+              }))
             }),
           });
         } catch (err) {
@@ -158,7 +162,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${activeConversationId}/messages`, {
+      await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -166,7 +170,10 @@ export default function ChatPage() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
-          message: newMessage
+          message: {
+            role: newMessage.role,
+            content: newMessage.content
+          }
         }),
       });
 
