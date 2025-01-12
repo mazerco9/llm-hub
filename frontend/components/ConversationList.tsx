@@ -14,7 +14,7 @@ interface ConversationListProps {
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId }) => {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://llm-hub-backend.onrender.com/api';
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://llm-hub-backend.onrender.com';
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
   const fetchConversations = async () => {
     console.log("Using API URL:", API_URL);
     try {
-      const response = await fetch(`${API_URL}/conversations`, {
+      const response = await fetch(`${API_URL}/api/conversations`, {
         credentials: 'include',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -47,7 +47,7 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
   const createNewConversation = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/conversations`, {
+      const response = await fetch(`${API_URL}/api/conversations`, {
         method: 'POST',
         credentials: 'include',
         headers: {
