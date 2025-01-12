@@ -33,8 +33,11 @@ export default function ChatPage() {
 
   const loadConversationMessages = async (conversationId: string) => {
     try {
-      const response = await fetch(`/api/conversations/${conversationId}`, {
-        credentials: 'include'
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${conversationId}`, {
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       if (!response.ok) throw new Error('Failed to load conversation');
       const data = await response.json();
@@ -109,11 +112,12 @@ export default function ChatPage() {
 
       if (activeConversationId && messages.length > 0) {
         try {
-          await fetch(`/api/conversations/${activeConversationId}/messages`, {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${activeConversationId}/messages`, {
             method: 'POST',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
               messages: messages
@@ -154,11 +158,12 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      await fetch(`/api/conversations/${activeConversationId}/messages`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations/${activeConversationId}/messages`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           message: newMessage

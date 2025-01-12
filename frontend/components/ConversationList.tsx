@@ -27,7 +27,6 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations`, {
         credentials: 'include',
         headers: {
-          // Ajout du token d'authentification
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
@@ -37,7 +36,6 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
       const data = await response.json();
       setConversations(data);
     } catch (err) {
-      setError('Failed to load conversations');
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -62,13 +60,11 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
       setConversations([...conversations, newConversation]);
       onSelect(newConversation._id);
     } catch (err) {
-      setError('Failed to create new conversation');
       console.error('Error:', err);
     }
   };
 
   if (loading) return <div className="p-4">Loading...</div>;
-  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
     <div className="w-64 h-full border-r border-gray-200 p-4">
@@ -80,22 +76,30 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
       </Button>
       
       <div className="space-y-2">
-        {conversations.map((conv) => (
-          <Card
-            key={conv._id}
-            className={`p-3 cursor-pointer hover:bg-gray-100 ${
-              activeId === conv._id ? 'bg-gray-100' : ''
-            }`}
-            onClick={() => onSelect(conv._id)}
-          >
-            <h3 className="text-sm font-medium truncate">
-              {conv.title || 'New Conversation'}
-            </h3>
-            <p className="text-xs text-gray-500 truncate">
-              {new Date(conv.updatedAt).toLocaleDateString()}
-            </p>
-          </Card>
-        ))}
+        {conversations.length === 0 ? (
+          <div className="text-center text-gray-500 text-sm p-4">
+            Aucune conversation
+            <br />
+            Cliquez sur "New Chat" pour commencer
+          </div>
+        ) : (
+          conversations.map((conv) => (
+            <Card
+              key={conv._id}
+              className={`p-3 cursor-pointer hover:bg-gray-100 ${
+                activeId === conv._id ? 'bg-gray-100' : ''
+              }`}
+              onClick={() => onSelect(conv._id)}
+            >
+              <h3 className="text-sm font-medium truncate">
+                {conv.title || 'New Conversation'}
+              </h3>
+              <p className="text-xs text-gray-500 truncate">
+                {new Date(conv.updatedAt).toLocaleDateString()}
+              </p>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
