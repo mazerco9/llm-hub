@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { claudeService } from '../services/claude.service';
 import mongoose from 'mongoose';
+import { Socket } from 'socket.io';
 
-// Interface pour les erreurs typées
 interface ApiError {
   message: string;
   stack?: string;
@@ -15,6 +15,35 @@ interface AuthRequest extends Request {
 }
 
 export const chatController = {
+  async handleStreamMessage(socket: Socket, message: string) {
+    try {
+      console.log('=== Début du streaming ===');
+      console.log('Message reçu pour streaming:', message);
+
+      const messages = [{ role: 'user' as const, content: message }];
+      const stream = await claudeService.streamMessage(messages);
+
+      stream.on('data', (chunk: string) => {
+        console.log('Envoi du chunk au client:', chunk);
+        socket.emit('message-chunk', { content: chunk });
+      });
+
+      stream.on('end', () => {
+        console.log('Streaming terminé');
+        socket.emit('message-complete');
+      });
+
+      stream.on('error', (error: Error) => {
+        console.error('Erreur streaming:', error);
+        socket.emit('stream-error', { message: error.message });
+      });
+
+    } catch (error) {
+      console.error('Erreur générale streaming:', error);
+      socket.emit('stream-error', { message: 'Erreur lors du streaming' });
+    }
+  },
+
   async sendMessage(req: AuthRequest, res: Response) {
     try {
       console.log('=== Début de sendMessage ===');
@@ -32,8 +61,6 @@ export const chatController = {
         });
       }
 
-      // Vérification du user
-      console.log('User dans la requête:', JSON.stringify(req.user, null, 2));
       if (!req.user?._id) {
         console.log('❌ Utilisateur non authentifié');
         return res.status(401).json({ 
@@ -43,12 +70,9 @@ export const chatController = {
       }
       console.log('✅ Utilisateur authentifié:', req.user._id);
 
-      // Appel à Claude
-      console.log('🔄 Préparation appel Claude avec message:', message);
-      const messages = [{ role: 'user' as const, content: message }];
-      
       try {
         console.log('🚀 Envoi à Claude...');
+        const messages = [{ role: 'user' as const, content: message }];
         console.log('Messages envoyés:', JSON.stringify(messages, null, 2));
         
         const claudeResponse = await claudeService.sendMessage(messages);
