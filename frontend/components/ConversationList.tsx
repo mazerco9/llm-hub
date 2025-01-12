@@ -24,8 +24,12 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
 
   const fetchConversations = async () => {
     try {
-      const response = await fetch('/api/conversations', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations`, {
         credentials: 'include',
+        headers: {
+          // Ajout du token d'authentification
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       
       if (!response.ok) throw new Error('Failed to fetch conversations');
@@ -42,18 +46,19 @@ const ConversationList: React.FC<ConversationListProps> = ({ onSelect, activeId 
 
   const createNewConversation = async () => {
     try {
-      const response = await fetch('/api/conversations', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversations`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ title: 'New Conversation' }),
       });
       
       if (!response.ok) throw new Error('Failed to create conversation');
       
-      const newConversation: Conversation = await response.json();
+      const newConversation = await response.json();
       setConversations([...conversations, newConversation]);
       onSelect(newConversation._id);
     } catch (err) {
