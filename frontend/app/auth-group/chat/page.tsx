@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  isComplete?: boolean;
 }
 
 export default function ChatPage() {
@@ -18,7 +19,15 @@ export default function ChatPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [streamingContent, setStreamingContent] = useState('');
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -43,28 +52,39 @@ export default function ChatPage() {
 
     socketInstance.on('message-chunk', (data: { content: string }) => {
       console.log('Reçu chunk:', data.content);
-      setStreamingContent(prev => prev + data.content);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        
+        if (lastMessage && lastMessage.role === 'assistant' && !lastMessage.isComplete) {
+          lastMessage.content += data.content;
+          return newMessages;
+        } else {
+          return [...prev, {
+            role: 'assistant',
+            content: data.content,
+            timestamp: new Date(),
+            isComplete: false
+          }];
+        }
+      });
     });
 
     socketInstance.on('message-complete', () => {
-      console.log('Message complet reçu, contenu:', streamingContent);
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: streamingContent,
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setStreamingContent('');
+      setMessages(prev => {
+        const newMessages = [...prev];
+        const lastMessage = newMessages[newMessages.length - 1];
+        if (lastMessage && !lastMessage.isComplete) {
+          lastMessage.isComplete = true;
+        }
+        return newMessages;
+      });
       setIsLoading(false);
     });
 
     socketInstance.on('stream-error', (error) => {
       console.error('Erreur streaming:', error);
       setIsLoading(false);
-    });
-
-    socketInstance.on('disconnect', () => {
-      console.log('Déconnecté de Socket.IO');
     });
 
     setSocket(socketInstance);
@@ -77,26 +97,18 @@ export default function ChatPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || isLoading || !socket) {
-      console.log('Soumission impossible:', { 
-        message: inputMessage.trim(), 
-        isLoading, 
-        hasSocket: !!socket 
-      });
-      return;
-    }
+    if (!inputMessage.trim() || isLoading || !socket) return;
 
-    console.log('Envoi du message:', inputMessage.trim());
     const newMessage: Message = {
       role: 'user',
       content: inputMessage.trim(),
       timestamp: new Date(),
+      isComplete: true
     };
 
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsLoading(true);
-    setStreamingContent(''); // Réinitialiser le contenu streaming
 
     socket.emit('send-message', inputMessage.trim());
   };
@@ -120,27 +132,14 @@ export default function ChatPage() {
                     : 'bg-gray-100 dark:bg-gray-800'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 <p className="text-xs text-gray-400 mt-1">
                   {new Date(message.timestamp).toLocaleTimeString()}
                 </p>
               </div>
             </div>
           ))}
-          {streamingContent && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
-                <p className="text-sm whitespace-pre-wrap">{streamingContent}</p>
-              </div>
-            </div>
-          )}
-          {isLoading && !streamingContent && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
-                <p className="text-sm">Claude est en train d'écrire...</p>
-              </div>
-            </div>
-          )}
+          <div ref={messageEndRef} />
         </div>
 
         {/* Input form */}
