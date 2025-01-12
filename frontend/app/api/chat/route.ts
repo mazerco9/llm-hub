@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get('token')?.value;
+    const token = request.headers.get('authorization');
     if (!token) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -21,16 +21,16 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('Sending request to:', process.env.NEXT_PUBLIC_API_URL);
-    
+    console.log('With token:', token);
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Format Bearer
+        'Authorization': token,
         'Accept': 'application/json',
       },
       body: JSON.stringify({ message }),
-      credentials: 'include', // Important pour les cookies
     });
 
     if (!response.ok) {
@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error in chat API route:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'Internal server error', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     );
   }
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('token')?.value;
+    const token = request.headers.get('authorization');
     if (!token) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -62,7 +65,8 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/history`, {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': token,
+        'Accept': 'application/json',
       },
     });
 
@@ -77,7 +81,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching chat history:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'Internal server error', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     );
   }
