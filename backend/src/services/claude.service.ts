@@ -1,5 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config/environment';
+import { EventEmitter } from 'events';
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources/messages';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -29,10 +31,47 @@ class ClaudeService {
     });
   }
 
+  async streamMessage(messages: Message[]): Promise<EventEmitter> {
+    const emitter = new EventEmitter();
+    
+    try {
+      console.log('Démarrage du streaming avec Claude...');
+      const stream = await this.client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 1024,
+        messages: messages,
+        stream: true,
+      });
+
+      // Traitement du stream
+      (async () => {
+        try {
+          for await (const chunk of stream) {
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              console.log('Chunk reçu:', chunk.delta.text);
+              emitter.emit('data', chunk.delta.text);
+            }
+          }
+          console.log('Stream terminé');
+          emitter.emit('end');
+        } catch (error) {
+          console.error('Erreur pendant le streaming:', error);
+          emitter.emit('error', error);
+        }
+      })();
+
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation du stream:', error);
+      emitter.emit('error', error);
+    }
+
+    return emitter;
+  }
+
   async sendMessage(messages: Message[]): Promise<ClaudeResponse> {
     try {
       console.log('Tentative d\'envoi à Claude avec:', {
-        model: "claude-3-sonnet-20240229",
+        model: "claude-3-5-sonnet-20241022",
         messages: messages
       });
       
@@ -44,11 +83,10 @@ class ClaudeService {
 
       console.log('Réponse brute de Claude:', response);
       
-      // Vérification et extraction du texte de la réponse
       const content = response.content[0];
       console.log('Premier bloc de contenu:', content);
       
-      if ('text' in content) {
+      if (content.type === 'text') {
         const result = {
           text: content.text,
           usage: {

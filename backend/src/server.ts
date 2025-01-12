@@ -5,11 +5,13 @@ import { Server as SocketServer } from 'socket.io';
 import mongoose from 'mongoose';
 import winston from 'winston';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 import config from './config/environment';
 import authRoutes from './routes/auth.routes';
 import passport from './config/passport';
 import conversationRoutes from './routes/conversation.routes';
 import { chatRoutes } from './routes/chat.routes';
+import { chatController } from './controllers/chat.controller';
 
 // Chargement des variables d'environnement
 dotenv.config();
@@ -43,6 +45,46 @@ const io = new SocketServer(httpServer, {
     origin: config.cors.origin,
     methods: ['GET', 'POST']
   }
+});
+
+// Middleware d'authentification Socket.IO
+io.use((socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) {
+    logger.error('Tentative de connexion Socket.IO sans token');
+    return next(new Error('Authentication required'));
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    socket.data.user = decoded;
+    logger.info('Client Socket.IO authentifié:', decoded);
+    next();
+  } catch (error) {
+    logger.error('Erreur authentification Socket.IO:', error);
+    next(new Error('Invalid authentication'));
+  }
+});
+
+// Gestion des connexions Socket.IO
+io.on('connection', (socket) => {
+  logger.info('Nouveau client connecté', {
+    userId: socket.data.user?._id
+  });
+  
+  socket.on('send-message', (message: string) => {
+    logger.info('Message reçu pour streaming', {
+      userId: socket.data.user?._id,
+      messageLength: message.length
+    });
+    chatController.handleStreamMessage(socket, message);
+  });
+
+  socket.on('disconnect', () => {
+    logger.info('Client déconnecté', {
+      userId: socket.data.user?._id
+    });
+  });
 });
 
 // Middleware de logging pour toutes les requêtes
@@ -108,15 +150,6 @@ mongoose.connect(config.database.uri)
     logger.error('Erreur de connexion à MongoDB:', error);
     process.exit(1);
   });
-
-// Gestion de Socket.IO
-io.on('connection', (socket) => {
-  logger.info('Nouveau client connecté');
-  
-  socket.on('disconnect', () => {
-    logger.info('Client déconnecté');
-  });
-});
 
 // Gestion des signaux d'arrêt
 process.on('SIGTERM', async () => {

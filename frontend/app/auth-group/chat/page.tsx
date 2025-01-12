@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Send } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { io, Socket } from 'socket.io-client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,10 +17,51 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [streamingContent, setStreamingContent] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
+      auth: { token }
+    });
+
+    socketInstance.on('connect', () => {
+      console.log('Connecté à Socket.IO');
+    });
+
+    socketInstance.on('message-chunk', (data: { content: string }) => {
+      setStreamingContent(prev => prev + data.content);
+    });
+
+    socketInstance.on('message-complete', () => {
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: streamingContent,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+      setStreamingContent('');
+      setIsLoading(false);
+    });
+
+    socketInstance.on('stream-error', (error) => {
+      console.error('Erreur streaming:', error);
+      setIsLoading(false);
+    });
+
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || isLoading) return;
+    if (!inputMessage.trim() || isLoading || !socket) return;
 
     const newMessage: Message = {
       role: 'user',
@@ -31,34 +73,8 @@ export default function ChatPage() {
     setInputMessage('');
     setIsLoading(true);
 
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ message: inputMessage.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
-
-      const data = await response.json();
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: data.text,
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    // Envoi via Socket.IO pour le streaming
+    socket.emit('send-message', inputMessage.trim());
   };
 
   return (
@@ -87,7 +103,14 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
-          {isLoading && (
+          {streamingContent && (
+            <div className="flex justify-start">
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
+                <p className="text-sm">{streamingContent}</p>
+              </div>
+            </div>
+          )}
+          {isLoading && !streamingContent && (
             <div className="flex justify-start">
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
                 <p className="text-sm">Claude est en train d'écrire...</p>
