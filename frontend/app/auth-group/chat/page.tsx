@@ -22,21 +22,32 @@ export default function ChatPage() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+      console.log('Pas de token trouvé');
+      return;
+    }
 
+    console.log('Initialisation de Socket.IO...');
     const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
-      auth: { token }
+      auth: { token },
+      transports: ['websocket', 'polling']
     });
 
     socketInstance.on('connect', () => {
       console.log('Connecté à Socket.IO');
     });
 
+    socketInstance.on('connect_error', (error) => {
+      console.error('Erreur de connexion Socket.IO:', error.message);
+    });
+
     socketInstance.on('message-chunk', (data: { content: string }) => {
+      console.log('Reçu chunk:', data.content);
       setStreamingContent(prev => prev + data.content);
     });
 
     socketInstance.on('message-complete', () => {
+      console.log('Message complet reçu, contenu:', streamingContent);
       const assistantMessage: Message = {
         role: 'assistant',
         content: streamingContent,
@@ -52,17 +63,30 @@ export default function ChatPage() {
       setIsLoading(false);
     });
 
+    socketInstance.on('disconnect', () => {
+      console.log('Déconnecté de Socket.IO');
+    });
+
     setSocket(socketInstance);
 
     return () => {
+      console.log('Nettoyage de la connexion Socket.IO');
       socketInstance.disconnect();
     };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputMessage.trim() || isLoading || !socket) return;
+    if (!inputMessage.trim() || isLoading || !socket) {
+      console.log('Soumission impossible:', { 
+        message: inputMessage.trim(), 
+        isLoading, 
+        hasSocket: !!socket 
+      });
+      return;
+    }
 
+    console.log('Envoi du message:', inputMessage.trim());
     const newMessage: Message = {
       role: 'user',
       content: inputMessage.trim(),
@@ -72,8 +96,8 @@ export default function ChatPage() {
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
     setIsLoading(true);
+    setStreamingContent(''); // Réinitialiser le contenu streaming
 
-    // Envoi via Socket.IO pour le streaming
     socket.emit('send-message', inputMessage.trim());
   };
 
@@ -106,7 +130,7 @@ export default function ChatPage() {
           {streamingContent && (
             <div className="flex justify-start">
               <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2">
-                <p className="text-sm">{streamingContent}</p>
+                <p className="text-sm whitespace-pre-wrap">{streamingContent}</p>
               </div>
             </div>
           )}
