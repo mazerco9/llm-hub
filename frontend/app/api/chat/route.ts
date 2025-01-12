@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    // Vérifier que l'utilisateur est authentifié
-    // Cette partie sera gérée par notre middleware d'authentification
-    
+    const token = request.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { message } = body;
 
@@ -15,43 +20,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Appel à notre backend
+    console.log('Sending request to:', process.env.NEXT_PUBLIC_API_URL);
+    
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // On pourra ajouter ici le token d'authentification quand nécessaire
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ message }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get response from backend');
+      const errorData = await response.json();
+      console.error('Backend error:', errorData);
+      throw new Error(errorData.error || 'Failed to get response from backend');
     }
 
     const data = await response.json();
-
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error in chat API route:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
 
-// Optionnel : Ajouter une route GET pour récupérer l'historique des messages
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const token = request.cookies.get('token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/chat/history`, {
       headers: {
-        // On pourra ajouter ici le token d'authentification quand nécessaire
+        'Authorization': `Bearer ${token}`
       },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get chat history');
+      const errorData = await response.json();
+      console.error('Backend error:', errorData);
+      throw new Error(errorData.error || 'Failed to get chat history');
     }
 
     const data = await response.json();
@@ -59,7 +75,7 @@ export async function GET() {
   } catch (error) {
     console.error('Error fetching chat history:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
