@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { config } from '../config/environment';
 import { EventEmitter } from 'events';
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources/messages';
+import { MessageParam } from '@anthropic-ai/sdk/resources/messages/messages';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -31,15 +32,24 @@ class ClaudeService {
     });
   }
 
-  async streamMessage(messages: Message[]): Promise<EventEmitter> {
+  async streamMessage(messages: Message[] | string): Promise<EventEmitter> {
     const emitter = new EventEmitter();
     
     try {
       console.log('Démarrage du streaming avec Claude...');
+      
+      // Si messages est une string, créer un message formaté correctement
+      const formattedMessages: MessageParam[] = typeof messages === 'string' 
+        ? [{ role: 'user', content: messages }] 
+        : messages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })) as MessageParam[];
+
       const stream = await this.client.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-sonnet-20240229",
         max_tokens: 1024,
-        messages: messages,
+        messages: formattedMessages,
         stream: true,
       });
 
@@ -70,15 +80,20 @@ class ClaudeService {
 
   async sendMessage(messages: Message[]): Promise<ClaudeResponse> {
     try {
+      const formattedMessages: MessageParam[] = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })) as MessageParam[];
+
       console.log('Tentative d\'envoi à Claude avec:', {
-        model: "claude-3-5-sonnet-20241022",
-        messages: messages
+        model: "claude-3-sonnet-20240229",
+        messages: formattedMessages
       });
       
       const response = await this.client.messages.create({
         model: "claude-3-5-sonnet-20241022",
         max_tokens: 1024,
-        messages: messages,
+        messages: formattedMessages,
       });
 
       console.log('Réponse brute de Claude:', response);
