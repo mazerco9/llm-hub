@@ -32,10 +32,25 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-// Nouvelle route pour récupérer une conversation spécifique
 router.get('/:conversationId', async (req: Request, res: Response, next: NextFunction) => {
   try {
     await ConversationController.getConversation(req as AuthenticatedRequest, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put('/:conversationId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await ConversationController.updateConversation(req as AuthenticatedRequest, res);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:conversationId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await ConversationController.deleteConversation(req as AuthenticatedRequest, res);
   } catch (error) {
     next(error);
   }

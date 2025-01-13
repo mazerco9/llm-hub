@@ -103,3 +103,56 @@ export const getConversation = async (req: AuthenticatedRequest, res: Response) 
     res.status(500).json({ message: 'Error fetching conversation', error });
   }
 };
+
+export const deleteConversation = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const conversation = await Conversation.findOneAndDelete({
+      _id: conversationId,
+      userId
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    res.status(200).json({ message: 'Conversation deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting conversation', error });
+  }
+};
+
+export const updateConversation = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { conversationId } = req.params;
+    const { title } = req.body;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      userId
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    conversation.title = title;
+    conversation.updatedAt = new Date();
+    await conversation.save();
+
+    res.json(conversation);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating conversation', error });
+  }
+};
