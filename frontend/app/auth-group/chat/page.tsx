@@ -113,6 +113,7 @@ export default function ChatPage() {
 
       if (activeConversationId && messages.length > 0) {
         try {
+          const lastMessage = messages[messages.length - 1];
           await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
             method: 'POST',
             credentials: 'include',
@@ -121,10 +122,11 @@ export default function ChatPage() {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
-              messages: messages.map(msg => ({
-                role: msg.role,
-                content: msg.content
-              }))
+              message: {
+                role: lastMessage.role,
+                content: lastMessage.content,
+                model: 'claude-3-5-haiku-20241022'
+              }
             }),
           });
         } catch (err) {
@@ -162,6 +164,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
+      // Sauvegarde du message dans la conversation
       await fetch(`${API_URL}/api/conversations/${activeConversationId}/messages`, {
         method: 'POST',
         credentials: 'include',
@@ -172,11 +175,13 @@ export default function ChatPage() {
         body: JSON.stringify({
           message: {
             role: newMessage.role,
-            content: newMessage.content
+            content: newMessage.content,
+            model: 'claude-3-5-haiku-20241022'
           }
         }),
       });
 
+      // Envoi du message à Claude via Socket.IO
       socket.emit('send-message', {
         conversationId: activeConversationId,
         message: inputMessage.trim()
