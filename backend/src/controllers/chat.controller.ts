@@ -14,13 +14,23 @@ interface AuthRequest extends Request {
   };
 }
 
+interface StreamMessage {
+  conversationId: string;
+  message: string;
+}
+
 export const chatController = {
-  async handleStreamMessage(socket: Socket, message: string) {
+  async handleStreamMessage(socket: Socket, messageData: StreamMessage) {
     try {
       console.log('=== Début du streaming ===');
-      console.log('Message reçu pour streaming:', message);
+      console.log('Message reçu pour streaming:', messageData);
 
-      const messages = [{ role: 'user' as const, content: message }];
+      // On extrait seulement le texte du message
+      const messages = [{
+        role: 'user' as const,
+        content: messageData.message  // On utilise juste le texte du message
+      }];
+
       const stream = await claudeService.streamMessage(messages);
 
       stream.on('data', (chunk: string) => {
@@ -68,11 +78,13 @@ export const chatController = {
           details: 'No user ID found in request'
         });
       }
-      console.log('✅ Utilisateur authentifié:', req.user._id);
 
       try {
         console.log('🚀 Envoi à Claude...');
-        const messages = [{ role: 'user' as const, content: message }];
+        const messages = [{
+          role: 'user' as const,
+          content: message.content
+        }];
         console.log('Messages envoyés:', JSON.stringify(messages, null, 2));
         
         const claudeResponse = await claudeService.sendMessage(messages);
@@ -94,22 +106,6 @@ export const chatController = {
       console.error('Stack trace:', error.stack);
       return res.status(500).json({ 
         error: 'Internal server error',
-        details: error.message || 'Unknown error'
-      });
-    } finally {
-      console.log('=== Fin de sendMessage ===');
-    }
-  },
-
-  async getHistory(req: AuthRequest, res: Response) {
-    try {
-      console.log('Récupération de l\'historique');
-      return res.json([]);
-    } catch (rawError) {
-      const error = rawError as ApiError;
-      console.error('Erreur lors de la récupération de l\'historique:', error);
-      return res.status(500).json({ 
-        error: 'Failed to get chat history',
         details: error.message || 'Unknown error'
       });
     }
