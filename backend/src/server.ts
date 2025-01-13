@@ -73,12 +73,12 @@ io.on('connection', (socket) => {
     userId: socket.data.user?._id
   });
   
-  socket.on('send-message', (message: string) => {
+  socket.on('send-message', (messageData: { conversationId: string, message: string }) => {
     logger.info('Message reçu pour streaming', {
       userId: socket.data.user?._id,
-      messageLength: message.length
+      messageLength: messageData.message.length
     });
-    chatController.handleStreamMessage(socket, message);
+    chatController.handleStreamMessage(socket, messageData);
   });
 
   socket.on('disconnect', () => {

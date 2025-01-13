@@ -26,6 +26,5 @@ const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response) => Promise<
 
 // Routes avec gestion des types
 router.post('/', auth, asyncHandler(chatController.sendMessage));
-router.get('/history', auth, asyncHandler(chatController.getHistory));
 
 export const chatRoutes = router;
